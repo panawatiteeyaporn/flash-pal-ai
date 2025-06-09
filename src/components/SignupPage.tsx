@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Brain, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 function SignupPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,11 @@ function SignupPage() {
     password: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -17,10 +23,32 @@ function SignupPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Signup functionality will be implemented later
-    console.log('Signup attempt:', formData);
+    setLoading(true);
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await signUp(formData.email, formData.password, formData.name);
+    
+    if (error) {
+      setError(error.message);
+    } else {
+      navigate('/dashboard');
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -51,6 +79,13 @@ function SignupPage() {
             <p className="text-gray-600">Start your learning journey today</p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -68,6 +103,7 @@ function SignupPage() {
                   placeholder="Enter your full name"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -87,6 +123,7 @@ function SignupPage() {
                   placeholder="Enter your email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -106,6 +143,7 @@ function SignupPage() {
                   placeholder="Create a password"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -125,15 +163,17 @@ function SignupPage() {
                   placeholder="Confirm your password"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 

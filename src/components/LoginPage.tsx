@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Brain, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
   const [activeTab, setActiveTab] = useState<'email' | 'magic'>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Login functionality will be implemented later
-    console.log('Login attempt:', { email, password });
+    setLoading(true);
+    setError('');
+
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      setError(error.message);
+    } else {
+      navigate('/dashboard');
+    }
+    
+    setLoading(false);
   };
 
   const handleMagicLink = (e: React.FormEvent) => {
@@ -46,6 +62,13 @@ function LoginPage() {
             <h1 className="text-3xl font-bold text-slate-800 mb-2">Welcome Back</h1>
             <p className="text-gray-600">Sign in to your FlashPalAI account</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
 
           {/* Tab Navigation */}
           <div className="flex mb-8 bg-gray-100/50 rounded-xl p-1">
@@ -88,6 +111,7 @@ function LoginPage() {
                     placeholder="Enter your email"
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -106,6 +130,7 @@ function LoginPage() {
                     placeholder="Enter your password"
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -121,9 +146,10 @@ function LoginPage() {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           )}
