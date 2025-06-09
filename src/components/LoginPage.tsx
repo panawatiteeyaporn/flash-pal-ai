@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Brain, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Brain, Mail, Lock, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
@@ -9,9 +9,12 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
   const [error, setError] = useState('');
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithMagicLink } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,10 +33,22 @@ function LoginPage() {
     setLoading(false);
   };
 
-  const handleMagicLink = (e: React.FormEvent) => {
+  const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Magic link functionality will be implemented later
-    console.log('Magic link request for:', email);
+    setMagicLinkLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    const { error, message } = await signInWithMagicLink(email);
+    
+    if (error) {
+      setError(error.message);
+    } else {
+      setMagicLinkSent(true);
+      setSuccessMessage(message || 'Magic link sent to your email!');
+    }
+    
+    setMagicLinkLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -81,6 +96,16 @@ function LoginPage() {
           {error && (
             <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <p className="text-green-600 text-sm">{successMessage}</p>
+              </div>
             </div>
           )}
 
@@ -185,20 +210,44 @@ function LoginPage() {
                     placeholder="Enter your email"
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 bg-white/50 backdrop-blur-sm"
                     required
+                    disabled={magicLinkLoading || magicLinkSent}
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                disabled={magicLinkLoading || magicLinkSent}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Send Magic Link
+                {magicLinkLoading ? 'Sending...' : magicLinkSent ? 'Magic Link Sent!' : 'Send Magic Link'}
               </button>
 
-              <p className="text-sm text-gray-600 text-center">
-                We'll send you a secure link to sign in instantly
-              </p>
+              {!magicLinkSent && (
+                <p className="text-sm text-gray-600 text-center">
+                  We'll send you a secure link to sign in instantly. 
+                  <br />
+                  <span className="font-medium">New users will be automatically registered!</span>
+                </p>
+              )}
+
+              {magicLinkSent && (
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-gray-600">
+                    Check your email and click the magic link to continue.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMagicLinkSent(false);
+                      setSuccessMessage('');
+                    }}
+                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                  >
+                    Send another link
+                  </button>
+                </div>
+              )}
             </form>
           )}
 
