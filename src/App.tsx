@@ -25,14 +25,15 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route 
+      <Route path="/dashboard" element={<Dashboard />} />
+      {/* <Route 
         path="/dashboard" 
         element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         } 
-      />
+      /> */}
     </Routes>
   );
 }
