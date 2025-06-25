@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Brain, ArrowLeft, Plus, Trash2, Save, Check, AlertCircle, BookOpen, Zap } from 'lucide-react';
+import { Brain, ArrowLeft, Plus, Trash2, Save, Check, AlertCircle, BookOpen, Zap, Edit3 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { FlashcardService } from '../lib/flashcardService';
 import QuillEditor from './QuillEditor';
 
+interface FlashcardData {
+  id: string;
+  front: any;
+  back: any;
+  frontImageUrl: string;
+  backImageUrl: string;
+}
+
 interface ReviewCardData {
   id: string;
+  name: string;
   content: any;
   imageUrl: string;
   flashcards: FlashcardData[];
-}
-
-interface FlashcardData {
-  id: string;
-  content: any;
-  imageUrl: string;
 }
 
 function CreateDeck() {
@@ -34,31 +37,46 @@ function CreateDeck() {
   const [reviewCards, setReviewCards] = useState<ReviewCardData[]>([
     {
       id: 'temp-1',
+      name: 'Review Card 1',
       content: { ops: [] },
       imageUrl: '',
       flashcards: [
-        { id: 'temp-1-1', content: { ops: [] }, imageUrl: '' },
-        { id: 'temp-1-2', content: { ops: [] }, imageUrl: '' }
+        { 
+          id: 'temp-1-1', 
+          front: { ops: [] }, 
+          back: { ops: [] }, 
+          frontImageUrl: '', 
+          backImageUrl: '' 
+        }
       ]
     }
   ]);
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [currentFlashcardIndex, setCurrentFlashcardIndex] = useState(0);
+  const [currentFlashcardSide, setCurrentFlashcardSide] = useState<'front' | 'back'>('front');
 
   const addReviewCard = () => {
+    const newCardNumber = reviewCards.length + 1;
     const newCard: ReviewCardData = {
       id: `temp-${Date.now()}`,
+      name: `Review Card ${newCardNumber}`,
       content: { ops: [] },
       imageUrl: '',
       flashcards: [
-        { id: `temp-${Date.now()}-1`, content: { ops: [] }, imageUrl: '' },
-        { id: `temp-${Date.now()}-2`, content: { ops: [] }, imageUrl: '' }
+        { 
+          id: `temp-${Date.now()}-1`, 
+          front: { ops: [] }, 
+          back: { ops: [] }, 
+          frontImageUrl: '', 
+          backImageUrl: '' 
+        }
       ]
     };
     setReviewCards([...reviewCards, newCard]);
     setCurrentCardIndex(reviewCards.length);
     setCurrentFlashcardIndex(0);
+    setCurrentFlashcardSide('front');
   };
 
   const removeReviewCard = (index: number) => {
@@ -69,23 +87,34 @@ function CreateDeck() {
       setCurrentCardIndex(newCards.length - 1);
     }
     setCurrentFlashcardIndex(0);
+    setCurrentFlashcardSide('front');
+  };
+
+  const updateReviewCardName = (index: number, name: string) => {
+    const updatedCards = [...reviewCards];
+    updatedCards[index].name = name;
+    setReviewCards(updatedCards);
   };
 
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `temp-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      content: { ops: [] },
-      imageUrl: ''
+      front: { ops: [] },
+      back: { ops: [] },
+      frontImageUrl: '',
+      backImageUrl: ''
     };
     
     const updatedCards = [...reviewCards];
-    updatedCards[cardIndex].flashcards.push(newFlashcard);
+    // Add new flashcard at the beginning of the array (above existing ones)
+    updatedCards[cardIndex].flashcards.unshift(newFlashcard);
     setReviewCards(updatedCards);
-    setCurrentFlashcardIndex(updatedCards[cardIndex].flashcards.length - 1);
+    setCurrentFlashcardIndex(0); // Select the newly created flashcard
+    setCurrentFlashcardSide('front');
   };
 
   const removeFlashcard = (cardIndex: number, flashcardIndex: number) => {
-    if (reviewCards[cardIndex].flashcards.length <= 2) return;
+    if (reviewCards[cardIndex].flashcards.length <= 1) return;
     
     const updatedCards = [...reviewCards];
     updatedCards[cardIndex].flashcards = updatedCards[cardIndex].flashcards.filter((_, i) => i !== flashcardIndex);
@@ -104,7 +133,11 @@ function CreateDeck() {
 
   const updateFlashcardContent = (content: any) => {
     const updatedCards = [...reviewCards];
-    updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].content = content;
+    if (currentFlashcardSide === 'front') {
+      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].front = content;
+    } else {
+      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].back = content;
+    }
     setReviewCards(updatedCards);
   };
 
@@ -116,11 +149,14 @@ function CreateDeck() {
         return reviewCards.every(card => {
           const hasContent = card.content?.ops?.length > 0 && 
                            card.content.ops.some((op: any) => op.insert && op.insert.trim());
-          const hasValidFlashcards = card.flashcards.length >= 2 && 
-                                   card.flashcards.every(fc => 
-                                     fc.content?.ops?.length > 0 && 
-                                     fc.content.ops.some((op: any) => op.insert && op.insert.trim())
-                                   );
+          const hasValidFlashcards = card.flashcards.length >= 1 && 
+                                   card.flashcards.every(fc => {
+                                     const hasFront = fc.front?.ops?.length > 0 && 
+                                                    fc.front.ops.some((op: any) => op.insert && op.insert.trim());
+                                     const hasBack = fc.back?.ops?.length > 0 && 
+                                                   fc.back.ops.some((op: any) => op.insert && op.insert.trim());
+                                     return hasFront && hasBack;
+                                   });
           return hasContent && hasValidFlashcards;
         });
       default:
@@ -154,14 +190,26 @@ function CreateDeck() {
 
         // Create flashcards for this review card
         for (const flashcard of reviewCard.flashcards) {
-          const { error: flashcardError } = await FlashcardService.createFlashcard(
+          // Create front flashcard
+          const { error: frontError } = await FlashcardService.createFlashcard(
             createdReviewCard.id,
-            flashcard.content,
-            flashcard.imageUrl
+            flashcard.front,
+            flashcard.frontImageUrl
           );
 
-          if (flashcardError) {
-            throw new Error(flashcardError.message || 'Failed to create flashcard');
+          if (frontError) {
+            throw new Error(frontError.message || 'Failed to create front flashcard');
+          }
+
+          // Create back flashcard
+          const { error: backError } = await FlashcardService.createFlashcard(
+            createdReviewCard.id,
+            flashcard.back,
+            flashcard.backImageUrl
+          );
+
+          if (backError) {
+            throw new Error(backError.message || 'Failed to create back flashcard');
           }
         }
       }
@@ -326,6 +374,7 @@ function CreateDeck() {
                       onClick={() => {
                         setCurrentCardIndex(index);
                         setCurrentFlashcardIndex(0);
+                        setCurrentFlashcardSide('front');
                       }}
                       className={`p-3 rounded-lg cursor-pointer transition-colors ${
                         currentCardIndex === index
@@ -334,7 +383,16 @@ function CreateDeck() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">Card {index + 1}</span>
+                        <input
+                          type="text"
+                          value={card.name}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            updateReviewCardName(index, e.target.value);
+                          }}
+                          className="text-sm font-medium bg-transparent border-none outline-none flex-1 mr-2"
+                          maxLength={50}
+                        />
                         {reviewCards.length > 1 && (
                           <button
                             onClick={(e) => {
@@ -348,7 +406,7 @@ function CreateDeck() {
                         )}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {card.flashcards.length} flashcards
+                        {card.flashcards.length} flashcard{card.flashcards.length !== 1 ? 's' : ''}
                       </div>
                     </div>
                   ))}
@@ -370,9 +428,14 @@ function CreateDeck() {
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
                 <div className="flex items-center space-x-2 mb-4">
                   <BookOpen className="w-5 h-5 text-indigo-500" />
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Review Card {currentCardIndex + 1}
-                  </h3>
+                  <input
+                    type="text"
+                    value={currentCard?.name || ''}
+                    onChange={(e) => updateReviewCardName(currentCardIndex, e.target.value)}
+                    className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none"
+                    maxLength={50}
+                  />
+                  <Edit3 className="w-4 h-4 text-gray-400" />
                 </div>
                 
                 <p className="text-sm text-gray-600 mb-4">
@@ -394,7 +457,7 @@ function CreateDeck() {
                   <div className="flex items-center space-x-2">
                     <Zap className="w-5 h-5 text-purple-500" />
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Flashcards for Card {currentCardIndex + 1}
+                      Flashcards for {currentCard?.name}
                     </h3>
                   </div>
                   
@@ -411,39 +474,110 @@ function CreateDeck() {
                   Create practice questions or prompts. Students will use these to test their understanding.
                 </p>
 
-                {/* Flashcard Tabs */}
-                <div className="flex space-x-2 mb-4 overflow-x-auto">
+                {/* Flashcard List */}
+                <div className="space-y-4 mb-6">
                   {currentCard?.flashcards.map((flashcard, index) => (
-                    <div key={flashcard.id} className="flex items-center space-x-1">
-                      <button
-                        onClick={() => setCurrentFlashcardIndex(index)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                          currentFlashcardIndex === index
-                            ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
-                            : 'bg-white/50 text-gray-600 hover:bg-white/70 border-2 border-transparent'
-                        }`}
-                      >
-                        Flashcard {index + 1}
-                      </button>
+                    <div key={flashcard.id} className="bg-white/50 rounded-xl p-4 border border-white/20">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="text-sm font-medium text-purple-600">
+                          Flashcard {index + 1}
+                        </div>
+                        {currentCard.flashcards.length > 1 && (
+                          <button
+                            onClick={() => removeFlashcard(currentCardIndex, index)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                       
-                      {currentCard.flashcards.length > 2 && (
-                        <button
-                          onClick={() => removeFlashcard(currentCardIndex, index)}
-                          className="text-red-500 hover:text-red-700 p-1"
+                      <div className="grid grid-cols-2 gap-4">
+                        <div 
+                          className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                            currentFlashcardIndex === index && currentFlashcardSide === 'front'
+                              ? 'bg-indigo-100 border-2 border-indigo-300'
+                              : 'bg-white/70 hover:bg-white/90 border-2 border-transparent'
+                          }`}
+                          onClick={() => {
+                            setCurrentFlashcardIndex(index);
+                            setCurrentFlashcardSide('front');
+                          }}
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
+                          <div className="text-xs font-medium text-gray-600 mb-2">Front</div>
+                          <div className="text-sm text-gray-700 line-clamp-3">
+                            {flashcard.front?.ops?.length > 0 && flashcard.front.ops.some((op: any) => op.insert && op.insert.trim())
+                              ? flashcard.front.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
+                              : 'Click to edit front side'
+                            }
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                            currentFlashcardIndex === index && currentFlashcardSide === 'back'
+                              ? 'bg-indigo-100 border-2 border-indigo-300'
+                              : 'bg-white/70 hover:bg-white/90 border-2 border-transparent'
+                          }`}
+                          onClick={() => {
+                            setCurrentFlashcardIndex(index);
+                            setCurrentFlashcardSide('back');
+                          }}
+                        >
+                          <div className="text-xs font-medium text-gray-600 mb-2">Back</div>
+                          <div className="text-sm text-gray-700 line-clamp-3">
+                            {flashcard.back?.ops?.length > 0 && flashcard.back.ops.some((op: any) => op.insert && op.insert.trim())
+                              ? flashcard.back.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
+                              : 'Click to edit back side'
+                            }
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <QuillEditor
-                  value={currentFlashcard?.content}
-                  onChange={updateFlashcardContent}
-                  placeholder="Create a question, prompt, or practice scenario..."
-                  maxLength={350}
-                />
+                {/* Current Flashcard Editor */}
+                {currentFlashcard && (
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Zap className="w-5 h-5 text-purple-600" />
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        Editing Flashcard {currentFlashcardIndex + 1} - {currentFlashcardSide === 'front' ? 'Front' : 'Back'}
+                      </h4>
+                    </div>
+                    
+                    <div className="flex space-x-2 mb-4">
+                      <button
+                        onClick={() => setCurrentFlashcardSide('front')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          currentFlashcardSide === 'front'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white/70 text-gray-600 hover:bg-white/90'
+                        }`}
+                      >
+                        Front
+                      </button>
+                      <button
+                        onClick={() => setCurrentFlashcardSide('back')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          currentFlashcardSide === 'back'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-white/70 text-gray-600 hover:bg-white/90'
+                        }`}
+                      >
+                        Back
+                      </button>
+                    </div>
+
+                    <QuillEditor
+                      value={currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back}
+                      onChange={updateFlashcardContent}
+                      placeholder={`Create the ${currentFlashcardSide} side of your flashcard...`}
+                      maxLength={350}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Navigation */}
@@ -498,7 +632,7 @@ function CreateDeck() {
             <div className="space-y-4 mb-8">
               {reviewCards.map((card, cardIndex) => (
                 <div key={card.id} className="bg-white/50 rounded-xl p-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Review Card {cardIndex + 1}</h4>
+                  <h4 className="font-medium text-gray-900 mb-2">{card.name}</h4>
                   <div className="text-sm text-gray-600 mb-3">
                     <QuillEditor
                       value={card.content}
@@ -508,17 +642,30 @@ function CreateDeck() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     {card.flashcards.map((flashcard, flashcardIndex) => (
                       <div key={flashcard.id} className="bg-white/70 rounded-lg p-3">
-                        <div className="text-xs font-medium text-purple-600 mb-1">
+                        <div className="text-xs font-medium text-purple-600 mb-2">
                           Flashcard {flashcardIndex + 1}
                         </div>
-                        <QuillEditor
-                          value={flashcard.content}
-                          onChange={() => {}}
-                          readOnly={true}
-                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <div className="text-xs font-medium text-gray-500 mb-1">Front</div>
+                            <QuillEditor
+                              value={flashcard.front}
+                              onChange={() => {}}
+                              readOnly={true}
+                            />
+                          </div>
+                          <div>
+                            <div className="text-xs font-medium text-gray-500 mb-1">Back</div>
+                            <QuillEditor
+                              value={flashcard.back}
+                              onChange={() => {}}
+                              readOnly={true}
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
