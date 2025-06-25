@@ -141,23 +141,36 @@ function CreateDeck() {
     setReviewCards(updatedCards);
   };
 
+  // Helper function to get current flashcard content
+  const getCurrentFlashcardContent = () => {
+    const currentCard = reviewCards[currentCardIndex];
+    const currentFlashcard = currentCard?.flashcards[currentFlashcardIndex];
+    
+    if (!currentFlashcard) return { ops: [] };
+    
+    return currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back;
+  };
+
+  // Helper function to check if content has actual text
+  const hasContent = (content: any) => {
+    if (!content || !content.ops) return false;
+    return content.ops.some((op: any) => op.insert && op.insert.trim().length > 0);
+  };
+
   const isStepValid = (stepNumber: number) => {
     switch (stepNumber) {
       case 1:
         return deckName.trim().length > 0;
       case 2:
         return reviewCards.every(card => {
-          const hasContent = card.content?.ops?.length > 0 && 
-                           card.content.ops.some((op: any) => op.insert && op.insert.trim());
+          const hasReviewContent = hasContent(card.content);
           const hasValidFlashcards = card.flashcards.length >= 1 && 
                                    card.flashcards.every(fc => {
-                                     const hasFront = fc.front?.ops?.length > 0 && 
-                                                    fc.front.ops.some((op: any) => op.insert && op.insert.trim());
-                                     const hasBack = fc.back?.ops?.length > 0 && 
-                                                   fc.back.ops.some((op: any) => op.insert && op.insert.trim());
+                                     const hasFront = hasContent(fc.front);
+                                     const hasBack = hasContent(fc.back);
                                      return hasFront && hasBack;
                                    });
-          return hasContent && hasValidFlashcards;
+          return hasReviewContent && hasValidFlashcards;
         });
       default:
         return true;
@@ -506,7 +519,7 @@ function CreateDeck() {
                         >
                           <div className="text-xs font-medium text-gray-600 mb-2">Front</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
-                            {flashcard.front?.ops?.length > 0 && flashcard.front.ops.some((op: any) => op.insert && op.insert.trim())
+                            {hasContent(flashcard.front)
                               ? flashcard.front.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
                               : 'Click to edit front side'
                             }
@@ -526,7 +539,7 @@ function CreateDeck() {
                         >
                           <div className="text-xs font-medium text-gray-600 mb-2">Back</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
-                            {flashcard.back?.ops?.length > 0 && flashcard.back.ops.some((op: any) => op.insert && op.insert.trim())
+                            {hasContent(flashcard.back)
                               ? flashcard.back.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
                               : 'Click to edit back side'
                             }
@@ -571,7 +584,8 @@ function CreateDeck() {
                     </div>
 
                     <QuillEditor
-                      value={currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back}
+                      key={`${currentCardIndex}-${currentFlashcardIndex}-${currentFlashcardSide}`}
+                      value={getCurrentFlashcardContent()}
                       onChange={updateFlashcardContent}
                       placeholder={`Create the ${currentFlashcardSide} side of your flashcard...`}
                       maxLength={350}
