@@ -4,7 +4,7 @@ import { Brain, ArrowLeft, BookOpen, Zap, Plus, Edit3, Trash2, Play, BarChart3 }
 import { useAuth } from '../contexts/AuthContext';
 import { FlashcardService } from '../lib/flashcardService';
 import { DeckWithCards } from '../types/flashcard';
-import QuillEditor from './QuillEditor';
+import TiptapEditor from './TiptapEditor';
 
 function DeckView() {
   const { id } = useParams<{ id: string }>();
@@ -185,7 +185,7 @@ function DeckView() {
                 </div>
                 
                 <div className="mb-6">
-                  <QuillEditor
+                  <TiptapEditor
                     value={reviewCard.content}
                     onChange={() => {}}
                     readOnly={true}
@@ -226,7 +226,7 @@ function DeckView() {
                             </div>
                           </div>
                           
-                          <QuillEditor
+                          <TiptapEditor
                             value={flashcard.content}
                             onChange={() => {}}
                             readOnly={true}

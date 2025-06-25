@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Brain, ArrowLeft, Plus, Trash2, Save, Check, AlertCircle, BookOpen, Zap, Edit3 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { FlashcardService } from '../lib/flashcardService';
-import QuillEditor from './QuillEditor';
+import TiptapEditor from './TiptapEditor';
 
 interface FlashcardData {
   id: string;
@@ -38,13 +38,13 @@ function CreateDeck() {
     {
       id: 'temp-1',
       name: 'Review Card 1',
-      content: { ops: [] },
+      content: null,
       imageUrl: '',
       flashcards: [
         { 
           id: 'temp-1-1', 
-          front: { ops: [] }, 
-          back: { ops: [] }, 
+          front: null, 
+          back: null, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -61,13 +61,13 @@ function CreateDeck() {
     const newCard: ReviewCardData = {
       id: `temp-${Date.now()}`,
       name: `Review Card ${newCardNumber}`,
-      content: { ops: [] },
+      content: null,
       imageUrl: '',
       flashcards: [
         { 
           id: `temp-${Date.now()}-1`, 
-          front: { ops: [] }, 
-          back: { ops: [] }, 
+          front: null, 
+          back: null, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -99,8 +99,8 @@ function CreateDeck() {
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `temp-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      front: { ops: [] },
-      back: { ops: [] },
+      front: null,
+      back: null,
       frontImageUrl: '',
       backImageUrl: ''
     };
@@ -146,15 +146,45 @@ function CreateDeck() {
     const currentCard = reviewCards[currentCardIndex];
     const currentFlashcard = currentCard?.flashcards[currentFlashcardIndex];
     
-    if (!currentFlashcard) return { ops: [] };
+    if (!currentFlashcard) return null;
     
     return currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back;
   };
 
   // Helper function to check if content has actual text
   const hasContent = (content: any) => {
-    if (!content || !content.ops) return false;
-    return content.ops.some((op: any) => op.insert && op.insert.trim().length > 0);
+    if (!content) return false;
+    
+    // For Tiptap JSON format
+    if (content.type === 'doc' && content.content) {
+      return content.content.some((node: any) => {
+        if (node.type === 'paragraph' && node.content) {
+          return node.content.some((textNode: any) => textNode.text && textNode.text.trim().length > 0);
+        }
+        return node.content && node.content.length > 0;
+      });
+    }
+    
+    return false;
+  };
+
+  // Helper function to get text preview from Tiptap content
+  const getTextPreview = (content: any, maxLength: number = 100) => {
+    if (!content || !content.content) return '';
+    
+    let text = '';
+    const extractText = (nodes: any[]) => {
+      for (const node of nodes) {
+        if (node.type === 'text') {
+          text += node.text;
+        } else if (node.content) {
+          extractText(node.content);
+        }
+      }
+    };
+    
+    extractText(content.content);
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   const isStepValid = (stepNumber: number) => {
@@ -455,7 +485,7 @@ function CreateDeck() {
                   Create content that teaches a concept. This will be shown to students before they practice with flashcards.
                 </p>
 
-                <QuillEditor
+                <TiptapEditor
                   value={currentCard?.content}
                   onChange={updateReviewCardContent}
                   placeholder="Explain the concept, provide examples, or share key information..."
@@ -520,7 +550,7 @@ function CreateDeck() {
                           <div className="text-xs font-medium text-gray-600 mb-2">Front</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
                             {hasContent(flashcard.front)
-                              ? flashcard.front.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
+                              ? getTextPreview(flashcard.front, 100)
                               : 'Click to edit front side'
                             }
                           </div>
@@ -540,7 +570,7 @@ function CreateDeck() {
                           <div className="text-xs font-medium text-gray-600 mb-2">Back</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
                             {hasContent(flashcard.back)
-                              ? flashcard.back.ops.map((op: any) => op.insert).join('').substring(0, 100) + '...'
+                              ? getTextPreview(flashcard.back, 100)
                               : 'Click to edit back side'
                             }
                           </div>
@@ -583,7 +613,7 @@ function CreateDeck() {
                       </button>
                     </div>
 
-                    <QuillEditor
+                    <TiptapEditor
                       key={`${currentCardIndex}-${currentFlashcardIndex}-${currentFlashcardSide}`}
                       value={getCurrentFlashcardContent()}
                       onChange={updateFlashcardContent}
@@ -648,7 +678,7 @@ function CreateDeck() {
                 <div key={card.id} className="bg-white/50 rounded-xl p-4">
                   <h4 className="font-medium text-gray-900 mb-2">{card.name}</h4>
                   <div className="text-sm text-gray-600 mb-3">
-                    <QuillEditor
+                    <TiptapEditor
                       value={card.content}
                       onChange={() => {}}
                       readOnly={true}
@@ -665,7 +695,7 @@ function CreateDeck() {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <div className="text-xs font-medium text-gray-500 mb-1">Front</div>
-                            <QuillEditor
+                            <TiptapEditor
                               value={flashcard.front}
                               onChange={() => {}}
                               readOnly={true}
@@ -673,7 +703,7 @@ function CreateDeck() {
                           </div>
                           <div>
                             <div className="text-xs font-medium text-gray-500 mb-1">Back</div>
-                            <QuillEditor
+                            <TiptapEditor
                               value={flashcard.back}
                               onChange={() => {}}
                               readOnly={true}
