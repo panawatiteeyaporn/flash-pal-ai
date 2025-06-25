@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   Brain, 
@@ -120,7 +121,10 @@ function Dashboard() {
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button className="group bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105">
+                <Link 
+                  to="/create-deck"
+                  className="group bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-4 rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
+                >
                   <div className="flex items-center space-x-3">
                     <Plus className="w-6 h-6" />
                     <div className="text-left">
@@ -128,9 +132,12 @@ function Dashboard() {
                       <p className="text-sm text-indigo-100">Start a new deck</p>
                     </div>
                   </div>
-                </button>
+                </Link>
 
-                <button className="group bg-white/70 backdrop-blur-sm text-gray-700 p-4 rounded-xl hover:bg-white/90 transition-all duration-300 border border-white/30">
+                <Link 
+                  to="/decks"
+                  className="group bg-white/70 backdrop-blur-sm text-gray-700 p-4 rounded-xl hover:bg-white/90 transition-all duration-300 border border-white/30"
+                >
                   <div className="flex items-center space-x-3">
                     <BookOpen className="w-6 h-6 text-indigo-500" />
                     <div className="text-left">
@@ -138,7 +145,7 @@ function Dashboard() {
                       <p className="text-sm text-gray-500">Browse your decks</p>
                     </div>
                   </div>
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -146,9 +153,12 @@ function Dashboard() {
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Recent Study Decks</h2>
-                <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+                <Link 
+                  to="/decks"
+                  className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                >
                   View All
-                </button>
+                </Link>
               </div>
               
               <div className="space-y-4">

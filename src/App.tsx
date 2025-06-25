@@ -7,6 +7,9 @@ import SignupPage from './components/SignupPage';
 import Dashboard from './components/Dashboard';
 import AuthCallback from './components/AuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
+import CreateDeck from './components/CreateDeck';
+import DeckList from './components/DeckList';
+import DeckView from './components/DeckView';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -26,6 +29,9 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/create-deck" element={<CreateDeck />} />
+      <Route path="/decks" element={<DeckList />} />
+      <Route path="/deck/:id" element={<DeckView />} />
       {/* <Route 
         path="/dashboard" 
         element={
