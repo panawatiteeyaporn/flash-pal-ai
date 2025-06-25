@@ -124,8 +124,8 @@ function Dashboard() {
                   <div className="flex items-center space-x-3">
                     <Plus className="w-6 h-6" />
                     <div className="text-left">
-                      <p className="font-semibold">Create Study Set</p>
-                      <p className="text-sm text-indigo-100">Start a new topic</p>
+                      <p className="font-semibold">Create Study Deck</p>
+                      <p className="text-sm text-indigo-100">Start a new deck</p>
                     </div>
                   </div>
                 </button>
@@ -134,8 +134,8 @@ function Dashboard() {
                   <div className="flex items-center space-x-3">
                     <BookOpen className="w-6 h-6 text-indigo-500" />
                     <div className="text-left">
-                      <p className="font-semibold">Continue Learning</p>
-                      <p className="text-sm text-gray-500">Resume your progress</p>
+                      <p className="font-semibold">View Study Decks</p>
+                      <p className="text-sm text-gray-500">Browse your decks</p>
                     </div>
                   </div>
                 </button>
@@ -145,7 +145,7 @@ function Dashboard() {
             {/* Recent Study Sets */}
             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Recent Study Sets</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Recent Study Decks</h2>
                 <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
                   View All
                 </button>
