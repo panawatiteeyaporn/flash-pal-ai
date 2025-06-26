@@ -139,27 +139,25 @@ function TiptapEditor({
   const characterCount = editor.storage.characterCount.characters();
   const isAtLimit = characterCount >= maxLength;
 
-  // Curated color palette with better spacing and fewer options
+  // Color palette matching the design
   const colorPalette = [
     { name: 'Black', value: '#000000' },
-    { name: 'Gray', value: '#6b7280' },
-    { name: 'Red', value: '#dc2626' },
-    { name: 'Orange', value: '#ea580c' },
-    { name: 'Yellow', value: '#d97706' },
-    { name: 'Green', value: '#059669' },
-    { name: 'Blue', value: '#2563eb' },
-    { name: 'Purple', value: '#7c3aed' },
-    { name: 'Pink', value: '#e11d48' },
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Orange', value: '#f97316' },
+    { name: 'Yellow', value: '#eab308' },
+    { name: 'Green', value: '#22c55e' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Purple', value: '#8b5cf6' },
+    { name: 'Pink', value: '#ec4899' },
   ];
 
-  // Highlight color palette
+  // Highlight color palette matching the design
   const highlightPalette = [
-    { name: 'Yellow', value: '#fef08a', preview: '#fef08a' },
-    { name: 'Green', value: '#bbf7d0', preview: '#bbf7d0' },
-    { name: 'Blue', value: '#bfdbfe', preview: '#bfdbfe' },
-    { name: 'Purple', value: '#e9d5ff', preview: '#e9d5ff' },
-    { name: 'Pink', value: '#fbcfe8', preview: '#fbcfe8' },
-    { name: 'Orange', value: '#fed7aa', preview: '#fed7aa' },
+    { name: 'Green', value: '#bbf7d0' },
+    { name: 'Blue', value: '#bfdbfe' },
+    { name: 'Pink', value: '#fbcfe8' },
+    { name: 'Purple', value: '#e9d5ff' },
+    { name: 'Yellow', value: '#fef08a' },
   ];
 
   if (readOnly) {
@@ -314,31 +312,33 @@ function TiptapEditor({
             </button>
             
             {showColorPalette && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20 min-w-[200px]">
-                <div className="text-xs font-medium text-gray-700 mb-2">Text Color</div>
-                <div className="grid grid-cols-3 gap-2">
-                  {colorPalette.map((color) => (
-                    <button
-                      key={color.value}
-                      onClick={() => setColor(color.value)}
-                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors text-left"
-                      title={`Set color to ${color.name}`}
-                    >
-                      <div
-                        className="w-4 h-4 rounded border border-gray-300 flex-shrink-0"
-                        style={{ backgroundColor: color.value }}
-                      />
-                      <span className="text-xs text-gray-700">{color.name}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="border-t border-gray-200 mt-2 pt-2">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-20 min-w-[280px]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm font-medium text-gray-700">Text Color</div>
                   <button
                     onClick={() => setColor('#000000')}
                     className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    Reset to default
+                    Reset
                   </button>
+                </div>
+                <div className="flex items-center justify-center space-x-3">
+                  {colorPalette.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => setColor(color.value)}
+                      className="group relative"
+                      title={color.name}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:scale-110 shadow-sm"
+                        style={{ backgroundColor: color.value }}
+                      />
+                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        {color.name}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -358,30 +358,46 @@ function TiptapEditor({
             </button>
 
             {showHighlightPalette && (
-              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20 min-w-[200px]">
-                <div className="text-xs font-medium text-gray-700 mb-2">Highlight Color</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {highlightPalette.map((highlight) => (
-                    <button
-                      key={highlight.value}
-                      onClick={() => setHighlight(highlight.value)}
-                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors text-left"
-                      title={`Highlight with ${highlight.name}`}
-                    >
-                      <div
-                        className="w-4 h-4 rounded border border-gray-300 flex-shrink-0"
-                        style={{ backgroundColor: highlight.preview }}
-                      />
-                      <span className="text-xs text-gray-700">{highlight.name}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="border-t border-gray-200 mt-2 pt-2">
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-20 min-w-[260px]">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm font-medium text-gray-700">Highlight</div>
                   <button
                     onClick={() => setHighlight('none')}
                     className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    Remove highlight
+                    Remove
+                  </button>
+                </div>
+                <div className="flex items-center justify-center space-x-3">
+                  {highlightPalette.map((highlight) => (
+                    <button
+                      key={highlight.value}
+                      onClick={() => setHighlight(highlight.value)}
+                      className="group relative"
+                      title={highlight.name}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:scale-110 shadow-sm"
+                        style={{ backgroundColor: highlight.value }}
+                      />
+                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        {highlight.name}
+                      </div>
+                    </button>
+                  ))}
+                  {/* No highlight option */}
+                  <button
+                    onClick={() => setHighlight('none')}
+                    className="group relative"
+                    title="No highlight"
+                  >
+                    <div className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:scale-110 shadow-sm bg-white flex items-center justify-center">
+                      <div className="w-6 h-0.5 bg-red-400 rotate-45 absolute"></div>
+                      <div className="w-6 h-0.5 bg-red-400 -rotate-45 absolute"></div>
+                    </div>
+                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      None
+                    </div>
                   </button>
                 </div>
               </div>
