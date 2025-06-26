@@ -325,9 +325,6 @@ function TiptapEditor({
                         className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:scale-110 shadow-sm"
                         style={{ backgroundColor: color.value }}
                       />
-                      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        {color.name}
-                      </div>
                     </button>
                   ))}
                 </div>
