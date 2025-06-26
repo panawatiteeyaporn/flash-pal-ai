@@ -390,9 +390,6 @@ function TiptapEditor({
                       <div className="w-6 h-0.5 bg-red-400 rotate-45 absolute"></div>
                       <div className="w-6 h-0.5 bg-red-400 -rotate-45 absolute"></div>
                     </div>
-                    <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      None
-                    </div>
                   </button>
                 </div>
               </div>
