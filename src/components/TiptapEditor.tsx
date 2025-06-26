@@ -313,15 +313,6 @@ function TiptapEditor({
             
             {showColorPalette && (
               <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-20 min-w-[280px]">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-sm font-medium text-gray-700">Text Color</div>
-                  <button
-                    onClick={() => setColor('#000000')}
-                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                    Reset
-                  </button>
-                </div>
                 <div className="flex items-center justify-center space-x-3">
                   {colorPalette.map((color) => (
                     <button
