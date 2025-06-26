@@ -153,11 +153,11 @@ function TiptapEditor({
 
   // Highlight color palette matching the design
   const highlightPalette = [
-    { name: 'Green', value: '#bbf7d0' },
-    { name: 'Blue', value: '#bfdbfe' },
-    { name: 'Pink', value: '#fbcfe8' },
-    { name: 'Purple', value: '#e9d5ff' },
-    { name: 'Yellow', value: '#fef08a' },
+    { value: '#bbf7d0' },
+    { value: '#bfdbfe' },
+    { value: '#fbcfe8' },
+    { value: '#e9d5ff' },
+    { value: '#fef08a' },
   ];
 
   if (readOnly) {
