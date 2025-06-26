@@ -350,13 +350,6 @@ function TiptapEditor({
 
             {showHighlightPalette && (
               <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-20 min-w-[260px]">
-                <div className="flex items-center justify-between mb-3">
-                  <button
-                    onClick={() => setHighlight('none')}
-                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                  >
-                  </button>
-                </div>
                 <div className="flex items-center justify-center space-x-3">
                   {highlightPalette.map((highlight) => (
                     <button
