@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -25,7 +25,8 @@ import {
   Highlighter,
   Palette,
   Link as LinkIcon,
-  Type
+  Type,
+  ChevronDown
 } from 'lucide-react';
 
 interface TiptapEditorProps {
@@ -45,6 +46,8 @@ function TiptapEditor({
   className = "",
   readOnly = false
 }: TiptapEditorProps) {
+  const [showColorPalette, setShowColorPalette] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -89,6 +92,21 @@ function TiptapEditor({
     }
   }, [value, editor]);
 
+  // Close color palette when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.color-palette-container')) {
+        setShowColorPalette(false);
+      }
+    };
+
+    if (showColorPalette) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showColorPalette]);
+
   if (!editor) {
     return null;
   }
@@ -102,10 +120,24 @@ function TiptapEditor({
 
   const setColor = (color: string) => {
     editor.chain().focus().setColor(color).run();
+    setShowColorPalette(false);
   };
 
   const characterCount = editor.storage.characterCount.characters();
   const isAtLimit = characterCount >= maxLength;
+
+  // Curated color palette with better spacing and fewer options
+  const colorPalette = [
+    { name: 'Black', value: '#000000' },
+    { name: 'Gray', value: '#6b7280' },
+    { name: 'Red', value: '#dc2626' },
+    { name: 'Orange', value: '#ea580c' },
+    { name: 'Yellow', value: '#d97706' },
+    { name: 'Green', value: '#059669' },
+    { name: 'Blue', value: '#2563eb' },
+    { name: 'Purple', value: '#7c3aed' },
+    { name: 'Pink', value: '#e11d48' },
+  ];
 
   if (readOnly) {
     return (
@@ -245,27 +277,49 @@ function TiptapEditor({
 
         {/* Colors and Highlight */}
         <div className="flex items-center gap-1 border-r border-gray-200 pr-2 mr-2">
-          <div className="relative group">
+          <div className="relative color-palette-container">
             <button
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
+              onClick={() => setShowColorPalette(!showColorPalette)}
+              className={`p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-1 ${
+                showColorPalette ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600'
+              }`}
               title="Text Color"
             >
               <Type className="w-4 h-4" />
+              <ChevronDown className="w-3 h-3" />
             </button>
-            <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 hidden group-hover:block z-10">
-              <div className="grid grid-cols-6 gap-1">
-                {['#000000', '#374151', '#dc2626', '#ea580c', '#d97706', '#65a30d', '#059669', '#0891b2', '#2563eb', '#7c3aed', '#c026d3', '#e11d48'].map((color) => (
+            
+            {showColorPalette && (
+              <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-20 min-w-[200px]">
+                <div className="text-xs font-medium text-gray-700 mb-2">Text Color</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {colorPalette.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => setColor(color.value)}
+                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                      title={`Set color to ${color.name}`}
+                    >
+                      <div
+                        className="w-4 h-4 rounded border border-gray-300 flex-shrink-0"
+                        style={{ backgroundColor: color.value }}
+                      />
+                      <span className="text-xs text-gray-700">{color.name}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="border-t border-gray-200 mt-2 pt-2">
                   <button
-                    key={color}
-                    onClick={() => setColor(color)}
-                    className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
-                    style={{ backgroundColor: color }}
-                    title={`Set color to ${color}`}
-                  />
-                ))}
+                    onClick={() => setColor('#000000')}
+                    className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    Reset to default
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
+          
           <button
             onClick={() => editor.chain().focus().toggleHighlight().run()}
             className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
