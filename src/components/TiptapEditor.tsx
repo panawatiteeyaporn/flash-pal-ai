@@ -9,7 +9,8 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
-import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
+import CodeBlock from '@tiptap/extension-code-block';
 import { 
   Bold, 
   Italic, 
@@ -18,16 +19,15 @@ import {
   List, 
   ListOrdered, 
   Quote, 
-  Code, 
   AlignLeft, 
   AlignCenter, 
   AlignRight,
   Highlighter,
-  Palette,
-  Link as LinkIcon,
   Type,
-  ChevronDown
+  ChevronDown,
+  Code2
 } from 'lucide-react';
+import ImageUploadButton from './ImageUploadButton';
 
 interface TiptapEditorProps {
   value: any;
@@ -55,6 +55,7 @@ function TiptapEditor({
         heading: {
           levels: [1, 2, 3],
         },
+        code: false, // Disable inline code from StarterKit
       }),
       Underline,
       TextAlign.configure({
@@ -72,10 +73,14 @@ function TiptapEditor({
       }),
       TextStyle,
       Color,
-      Link.configure({
-        openOnClick: false,
+      Image.configure({
         HTMLAttributes: {
-          class: 'text-indigo-600 hover:text-indigo-700 underline cursor-pointer',
+          class: 'max-w-full h-auto rounded-lg',
+        },
+      }),
+      CodeBlock.configure({
+        HTMLAttributes: {
+          class: 'bg-gray-100 rounded-lg p-4 font-mono text-sm',
         },
       }),
     ],
@@ -114,13 +119,6 @@ function TiptapEditor({
   if (!editor) {
     return null;
   }
-
-  const addLink = () => {
-    const url = window.prompt('Enter URL:');
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
-    }
-  };
 
   const setColor = (color: string) => {
     editor.chain().focus().setColor(color).run();
@@ -353,7 +351,6 @@ function TiptapEditor({
                       key={highlight.value}
                       onClick={() => setHighlight(highlight.value)}
                       className="group relative"
-                      title={highlight.name}
                     >
                       <div
                         className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:scale-110 shadow-sm"
@@ -390,23 +387,15 @@ function TiptapEditor({
             <Quote className="w-4 h-4" />
           </button>
           <button
-            onClick={() => editor.chain().focus().toggleCode().run()}
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
-              editor.isActive('code') ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600'
+              editor.isActive('codeBlock') ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600'
             }`}
-            title="Inline Code"
+            title="Code Block"
           >
-            <Code className="w-4 h-4" />
+            <Code2 className="w-4 h-4" />
           </button>
-          <button
-            onClick={addLink}
-            className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
-              editor.isActive('link') ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600'
-            }`}
-            title="Add Link"
-          >
-            <LinkIcon className="w-4 h-4" />
-          </button>
+          <ImageUploadButton editor={editor} />
         </div>
       </div>
 
@@ -472,12 +461,21 @@ function TiptapEditor({
           color: #6b7280;
         }
         
-        .ProseMirror code {
+        .ProseMirror pre {
           background-color: #f3f4f6;
-          padding: 0.125rem 0.25rem;
-          border-radius: 0.25rem;
+          border-radius: 0.5rem;
+          padding: 1rem;
           font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-          font-size: 0.875em;
+          font-size: 0.875rem;
+          overflow-x: auto;
+          margin: 1rem 0;
+        }
+        
+        .ProseMirror pre code {
+          background: none;
+          padding: 0;
+          border-radius: 0;
+          font-size: inherit;
         }
         
         .ProseMirror mark {
@@ -485,13 +483,11 @@ function TiptapEditor({
           border-radius: 0.25rem;
         }
         
-        .ProseMirror a {
-          color: #4f46e5;
-          text-decoration: underline;
-        }
-        
-        .ProseMirror a:hover {
-          color: #3730a3;
+        .ProseMirror img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 0.5rem;
+          margin: 1rem 0;
         }
       `}</style>
     </div>
