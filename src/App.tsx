@@ -28,18 +28,10 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/create-deck" element={<CreateDeck />} />
-      <Route path="/decks" element={<DeckList />} />
-      <Route path="/deck/:id" element={<DeckView />} />
-      {/* <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } 
-      /> */}
+      <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute> } />
+	    <Route path="/create-deck" element={ <ProtectedRoute> <CreateDeck /> </ProtectedRoute> } />
+	    <Route path="/decks" element={ <ProtectedRoute> <DeckList /> </ProtectedRoute> } />
+	    <Route path="/deck/:id" element={ <ProtectedRoute> <DeckView /> </ProtectedRoute> } />
     </Routes>
   );
 }
