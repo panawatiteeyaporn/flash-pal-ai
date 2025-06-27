@@ -70,6 +70,7 @@ function TiptapEditor({
       }),
       CharacterCount.configure({
         limit: maxWords,
+        mode: 'words',
       }),
       TextStyle,
       Color,
