@@ -69,8 +69,7 @@ function TiptapEditor({
         placeholder,
       }),
       CharacterCount.configure({
-        limit: maxWords,
-        wordCounter: (text) => text.split(/\s+/).filter((word) => word !== '').length,
+        mode: 'textSize',
       }),
       TextStyle,
       Color,
@@ -135,8 +134,15 @@ function TiptapEditor({
     setShowHighlightPalette(false);
   };
 
-  const characterCount = editor.storage.characterCount.words();
-  const isAtLimit = characterCount >= maxWords;
+  // Get word count from editor text
+  const getWordCount = () => {
+    const text = editor.getText();
+    if (!text.trim()) return 0;
+    return text.trim().split(/\s+/).length;
+  };
+
+  const wordCount = getWordCount();
+  const isAtLimit = wordCount >= maxWords;
 
   // Color palette matching the design
   const colorPalette = [
@@ -407,11 +413,11 @@ function TiptapEditor({
           className="prose prose-sm max-w-none p-4 min-h-[120px] focus-within:outline-none"
         />
         
-        {/* Character Count */}
+        {/* Word Count */}
         <div className={`absolute bottom-2 right-2 text-xs px-2 py-1 rounded bg-white/80 ${
           isAtLimit ? 'text-red-600' : 'text-gray-500'
         }`}>
-          {characterCount}/{maxWords}
+          {wordCount}/{maxWords} words
         </div>
       </div>
 
