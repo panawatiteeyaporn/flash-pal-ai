@@ -70,7 +70,7 @@ function TiptapEditor({
       }),
       CharacterCount.configure({
         limit: maxWords,
-        mode: 'words',
+        wordCounter: (text) => text.split(/\s+/).filter((word) => word !== '').length,
       }),
       TextStyle,
       Color,
