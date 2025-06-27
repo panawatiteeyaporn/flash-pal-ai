@@ -198,11 +198,6 @@ function DeckView() {
                           Flashcards ({reviewCard.flashcards.length})
                         </h4>
                       </div>
-                      
-                      <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 text-sm flex items-center space-x-1">
-                        <Plus className="w-3 h-3" />
-                        <span>Add Flashcard</span>
-                      </button>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
