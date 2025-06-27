@@ -218,13 +218,6 @@ function DeckList() {
                       </p>
                     )}
                   </div>
-                  
-                  <div className="relative">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                    {/* Dropdown menu would go here */}
-                  </div>
                 </div>
 
                 <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
