@@ -151,6 +151,11 @@ function DeckView() {
                 <Edit3 className="w-5 h-5" />
                 <span>Edit Deck</span>
               </button>
+
+              <button className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center space-x-2">
+                <Trash2 className="w-5 h-5" />
+                <span>Delete Deck</span>
+              </button>
             </div>
           </div>
         </div>
