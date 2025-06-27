@@ -33,7 +33,7 @@ interface TiptapEditorProps {
   value: any;
   onChange: (content: any) => void;
   placeholder?: string;
-  maxLength?: number;
+  maxWords?: number;
   className?: string;
   readOnly?: boolean;
 }
@@ -42,7 +42,7 @@ function TiptapEditor({
   value, 
   onChange, 
   placeholder = "Start typing...", 
-  maxLength = 350,
+  maxWords = 350,
   className = "",
   readOnly = false
 }: TiptapEditorProps) {
@@ -69,7 +69,7 @@ function TiptapEditor({
         placeholder,
       }),
       CharacterCount.configure({
-        limit: maxLength,
+        limit: maxWords,
       }),
       TextStyle,
       Color,
@@ -134,8 +134,8 @@ function TiptapEditor({
     setShowHighlightPalette(false);
   };
 
-  const characterCount = editor.storage.characterCount.characters();
-  const isAtLimit = characterCount >= maxLength;
+  const characterCount = editor.storage.characterCount.words();
+  const isAtLimit = characterCount >= maxWords;
 
   // Color palette matching the design
   const colorPalette = [
@@ -410,7 +410,7 @@ function TiptapEditor({
         <div className={`absolute bottom-2 right-2 text-xs px-2 py-1 rounded bg-white/80 ${
           isAtLimit ? 'text-red-600' : 'text-gray-500'
         }`}>
-          {characterCount}/{maxLength}
+          {characterCount}/{maxWords}
         </div>
       </div>
 
