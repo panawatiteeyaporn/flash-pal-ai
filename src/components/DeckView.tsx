@@ -168,10 +168,13 @@ function DeckView() {
                   <span>View Progress</span>
                 </button>
                 
-                <button className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center justify-center space-x-2">
+                <Link
+                  to={`/edit-deck/${id}`}
+                  className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center justify-center space-x-2"
+                >
                   <Edit3 className="w-5 h-5" />
                   <span>Edit Deck</span>
-                </button>
+                </Link>
 
                 <button 
                   onClick={() => setShowDeleteModal(true)}
@@ -259,7 +262,7 @@ function DeckView() {
               Start building your deck by adding review cards and flashcards
             </p>
             <Link
-              to={`/create-deck`}
+              to={`/edit-deck/${id}`}
               className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 mx-auto w-fit"
             >
               <BookOpen className="w-5 h-5" />

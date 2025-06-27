@@ -489,7 +489,7 @@ function CreateDeck() {
                   value={currentCard?.content}
                   onChange={updateReviewCardContent}
                   placeholder="Explain the concept, provide examples, or share key information..."
-                  maxLength={350}
+                  maxWords={350}
                   className="mb-4"
                 />
               </div>
@@ -618,7 +618,7 @@ function CreateDeck() {
                       value={getCurrentFlashcardContent()}
                       onChange={updateFlashcardContent}
                       placeholder={`Create the ${currentFlashcardSide} side of your flashcard...`}
-                      maxLength={350}
+                      maxWords={350}
                     />
                   </div>
                 )}
