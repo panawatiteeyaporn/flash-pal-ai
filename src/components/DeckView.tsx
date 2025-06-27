@@ -212,14 +212,6 @@ function DeckView() {
                             <div className="text-xs font-medium text-purple-600">
                               Flashcard {flashcardIndex + 1}
                             </div>
-                            <div className="flex items-center space-x-1">
-                              <button className="p-1 text-gray-400 hover:text-indigo-600 transition-colors">
-                                <Edit3 className="w-3 h-3" />
-                              </button>
-                              <button className="p-1 text-gray-400 hover:text-red-600 transition-colors">
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            </div>
                           </div>
                           
                           <TiptapEditor
