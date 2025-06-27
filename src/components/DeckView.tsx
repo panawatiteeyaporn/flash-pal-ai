@@ -169,15 +169,6 @@ function DeckView() {
                     <BookOpen className="w-5 h-5 text-indigo-500" />
                     <h3 className="text-lg font-semibold text-gray-900">Review Card {index + 1}</h3>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-400 hover:text-indigo-600 transition-colors">
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-red-600 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
                 
                 <div className="mb-6">
