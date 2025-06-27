@@ -160,10 +160,6 @@ function DeckView() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Review Cards</h2>
-              <button className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 flex items-center space-x-2">
-                <Plus className="w-4 h-4" />
-                <span>Add Card</span>
-              </button>
             </div>
             
             {deck.review_cards.map((reviewCard, index) => (
