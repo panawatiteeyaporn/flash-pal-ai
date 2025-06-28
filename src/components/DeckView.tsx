@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Brain, ArrowLeft, BookOpen, Zap, Play, BarChart3, Edit3, Trash2, AlertTriangle } from 'lucide-react';
+import { Brain, ArrowLeft, BookOpen, Zap, Play, BarChart3, Edit3, Trash2, AlertTriangle, X, Calendar, Clock, Target, TrendingUp, Award, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { FlashcardService } from '../lib/flashcardService';
 import { DeckWithCards } from '../types/flashcard';
@@ -14,6 +14,7 @@ function DeckView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,41 @@ function DeckView() {
     return deck?.review_cards && deck.review_cards.length > 0 && 
            deck.review_cards.some(card => card.flashcards && card.flashcards.length > 0);
   };
+
+  // Mock progress data - replace with real data when available
+  const getMockProgressData = () => {
+    const totalFlashcards = deck?.review_cards?.reduce((total, card) => total + (card.flashcards?.length || 0), 0) || 0;
+    const masteredCards = Math.floor(totalFlashcards * 0.65);
+    const reviewingCards = Math.floor(totalFlashcards * 0.25);
+    const newCards = totalFlashcards - masteredCards - reviewingCards;
+    
+    return {
+      totalCards: totalFlashcards,
+      masteredCards,
+      reviewingCards,
+      newCards,
+      accuracy: 87,
+      studyStreak: 5,
+      totalStudyTime: 142, // minutes
+      lastStudied: '2 hours ago',
+      weeklyProgress: [
+        { day: 'Mon', cards: 12, time: 25 },
+        { day: 'Tue', cards: 8, time: 18 },
+        { day: 'Wed', cards: 15, time: 32 },
+        { day: 'Thu', cards: 10, time: 22 },
+        { day: 'Fri', cards: 18, time: 35 },
+        { day: 'Sat', cards: 6, time: 12 },
+        { day: 'Sun', cards: 14, time: 28 }
+      ],
+      difficultyBreakdown: {
+        easy: 45,
+        medium: 35,
+        hard: 20
+      }
+    };
+  };
+
+  const progressData = getMockProgressData();
 
   if (loading) {
     return (
@@ -178,7 +214,10 @@ function DeckView() {
               </button>
               
               <div className="flex flex-col sm:flex-row gap-3">
-                <button className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center justify-center space-x-2">
+                <button 
+                  onClick={() => setShowProgressModal(true)}
+                  className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center justify-center space-x-2"
+                >
                   <BarChart3 className="w-5 h-5" />
                   <span>View Progress</span>
                 </button>
@@ -308,6 +347,202 @@ function DeckView() {
           </div>
         )}
       </div>
+
+      {/* Progress Modal */}
+      {showProgressModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Study Progress</h3>
+                  <p className="text-sm text-gray-600">{deck.name}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowProgressModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Overview Stats */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                    <span className="text-2xl font-bold text-emerald-700">{progressData.masteredCards}</span>
+                  </div>
+                  <p className="text-sm font-medium text-emerald-600">Mastered Cards</p>
+                  <p className="text-xs text-emerald-500">
+                    {progressData.totalCards > 0 ? Math.round((progressData.masteredCards / progressData.totalCards) * 100) : 0}% of total
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <Target className="w-8 h-8 text-blue-600" />
+                    <span className="text-2xl font-bold text-blue-700">{progressData.accuracy}%</span>
+                  </div>
+                  <p className="text-sm font-medium text-blue-600">Accuracy Rate</p>
+                  <p className="text-xs text-blue-500">Last 30 days</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <Award className="w-8 h-8 text-orange-600" />
+                    <span className="text-2xl font-bold text-orange-700">{progressData.studyStreak}</span>
+                  </div>
+                  <p className="text-sm font-medium text-orange-600">Study Streak</p>
+                  <p className="text-xs text-orange-500">Days in a row</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <Clock className="w-8 h-8 text-purple-600" />
+                    <span className="text-2xl font-bold text-purple-700">{Math.floor(progressData.totalStudyTime / 60)}h {progressData.totalStudyTime % 60}m</span>
+                  </div>
+                  <p className="text-sm font-medium text-purple-600">Total Study Time</p>
+                  <p className="text-xs text-purple-500">All time</p>
+                </div>
+              </div>
+
+              {/* Card Status Breakdown */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Card Status Breakdown</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <CheckCircle className="w-8 h-8 text-emerald-600" />
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{progressData.masteredCards}</p>
+                    <p className="text-sm text-gray-600">Mastered</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <TrendingUp className="w-8 h-8 text-yellow-600" />
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{progressData.reviewingCards}</p>
+                    <p className="text-sm text-gray-600">Reviewing</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <BookOpen className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900">{progressData.newCards}</p>
+                    <p className="text-sm text-gray-600">New</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Weekly Progress Chart */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Weekly Activity</h4>
+                <div className="space-y-4">
+                  {progressData.weeklyProgress.map((day, index) => (
+                    <div key={day.day} className="flex items-center space-x-4">
+                      <div className="w-12 text-sm font-medium text-gray-600">{day.day}</div>
+                      <div className="flex-1 flex items-center space-x-3">
+                        <div className="flex-1 bg-gray-200 rounded-full h-3">
+                          <div 
+                            className="bg-gradient-to-r from-indigo-500 to-purple-500 h-3 rounded-full transition-all duration-300"
+                            style={{ width: `${(day.cards / 20) * 100}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-sm text-gray-600 w-16">{day.cards} cards</div>
+                        <div className="text-sm text-gray-500 w-16">{day.time}min</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Difficulty Breakdown */}
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Difficulty Distribution</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">Easy</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-32 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-emerald-500 h-2 rounded-full"
+                          style={{ width: `${progressData.difficultyBreakdown.easy}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-gray-600 w-12">{progressData.difficultyBreakdown.easy}%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">Medium</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-32 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-yellow-500 h-2 rounded-full"
+                          style={{ width: `${progressData.difficultyBreakdown.medium}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-gray-600 w-12">{progressData.difficultyBreakdown.medium}%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-700">Hard</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-32 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-red-500 h-2 rounded-full"
+                          style={{ width: `${progressData.difficultyBreakdown.hard}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-gray-600 w-12">{progressData.difficultyBreakdown.hard}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Last Study Session */}
+              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Calendar className="w-5 h-5 text-indigo-600" />
+                  <h4 className="text-lg font-semibold text-gray-900">Last Study Session</h4>
+                </div>
+                <p className="text-gray-600 mb-2">
+                  <span className="font-medium">Last studied:</span> {progressData.lastStudied}
+                </p>
+                <p className="text-gray-600">
+                  <span className="font-medium">Next review:</span> In 2 hours (based on spaced repetition)
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end p-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowProgressModal(false)}
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-600 transition-all duration-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
