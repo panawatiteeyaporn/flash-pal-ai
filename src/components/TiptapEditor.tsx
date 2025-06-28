@@ -15,7 +15,6 @@ import {
   Bold, 
   Italic, 
   Underline as UnderlineIcon, 
-  Strikethrough, 
   List, 
   ListOrdered, 
   Quote, 
@@ -167,7 +166,7 @@ function TiptapEditor({
 
   if (readOnly) {
     return (
-      <div className={`prose prose-sm max-w-none ${className}`}>
+      <div className={`tiptap-readonly ${className}`}>
         <EditorContent editor={editor} />
       </div>
     );
@@ -205,15 +204,6 @@ function TiptapEditor({
             title="Underline"
           >
             <UnderlineIcon className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
-              editor.isActive('strike') ? 'bg-indigo-100 text-indigo-600' : 'text-gray-600'
-            }`}
-            title="Strikethrough"
-          >
-            <Strikethrough className="w-4 h-4" />
           </button>
         </div>
 
@@ -436,36 +426,57 @@ function TiptapEditor({
         }
         
         .ProseMirror h1 {
-          font-size: 1.5rem;
+          font-size: 1.875rem;
           font-weight: 700;
-          margin-top: 1rem;
-          margin-bottom: 0.5rem;
+          line-height: 2.25rem;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+          color: #1f2937;
         }
         
         .ProseMirror h2 {
-          font-size: 1.25rem;
+          font-size: 1.5rem;
           font-weight: 600;
-          margin-top: 0.75rem;
-          margin-bottom: 0.5rem;
+          line-height: 2rem;
+          margin-top: 1.25rem;
+          margin-bottom: 0.75rem;
+          color: #1f2937;
         }
         
         .ProseMirror h3 {
-          font-size: 1.125rem;
+          font-size: 1.25rem;
           font-weight: 600;
-          margin-top: 0.5rem;
-          margin-bottom: 0.25rem;
+          line-height: 1.75rem;
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
+          color: #1f2937;
         }
         
-        .ProseMirror ul, .ProseMirror ol {
+        .ProseMirror ul {
+          list-style-type: disc;
           padding-left: 1.5rem;
+          margin: 1rem 0;
+        }
+        
+        .ProseMirror ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+          margin: 1rem 0;
+        }
+        
+        .ProseMirror li {
+          margin: 0.25rem 0;
+          line-height: 1.5;
         }
         
         .ProseMirror blockquote {
-          border-left: 4px solid #e5e7eb;
-          padding-left: 1rem;
-          margin: 1rem 0;
+          border-left: 4px solid #6366f1;
+          background-color: #f8fafc;
+          padding: 1rem 1.5rem;
+          margin: 1.5rem 0;
           font-style: italic;
-          color: #6b7280;
+          color: #475569;
+          border-radius: 0.5rem;
         }
         
         .ProseMirror pre {
@@ -495,6 +506,75 @@ function TiptapEditor({
           height: auto;
           border-radius: 0.5rem;
           margin: 1rem 0;
+        }
+
+        .ProseMirror p {
+          margin: 0.5rem 0;
+          line-height: 1.6;
+        }
+
+        /* Read-only specific styles */
+        .tiptap-readonly .ProseMirror {
+          padding: 0;
+        }
+
+        .tiptap-readonly .ProseMirror h1 {
+          font-size: 1.875rem;
+          font-weight: 700;
+          line-height: 2.25rem;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+          color: #1f2937;
+        }
+        
+        .tiptap-readonly .ProseMirror h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          line-height: 2rem;
+          margin-top: 1.25rem;
+          margin-bottom: 0.75rem;
+          color: #1f2937;
+        }
+        
+        .tiptap-readonly .ProseMirror h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          line-height: 1.75rem;
+          margin-top: 1rem;
+          margin-bottom: 0.5rem;
+          color: #1f2937;
+        }
+        
+        .tiptap-readonly .ProseMirror ul {
+          list-style-type: disc;
+          padding-left: 1.5rem;
+          margin: 1rem 0;
+        }
+        
+        .tiptap-readonly .ProseMirror ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+          margin: 1rem 0;
+        }
+        
+        .tiptap-readonly .ProseMirror li {
+          margin: 0.25rem 0;
+          line-height: 1.5;
+        }
+        
+        .tiptap-readonly .ProseMirror blockquote {
+          border-left: 4px solid #6366f1;
+          background-color: #f8fafc;
+          padding: 1rem 1.5rem;
+          margin: 1.5rem 0;
+          font-style: italic;
+          color: #475569;
+          border-radius: 0.5rem;
+        }
+
+        .tiptap-readonly .ProseMirror p {
+          margin: 0.5rem 0;
+          line-height: 1.6;
         }
       `}</style>
     </div>
