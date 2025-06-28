@@ -8,8 +8,8 @@ import TiptapEditor from './TiptapEditor';
 
 interface FlashcardData {
   id: string;
-  front: any;
-  back: any;
+  frontContent: any;
+  backContent: any;
   frontImageUrl: string;
   backImageUrl: string;
   isNew?: boolean;
@@ -83,10 +83,10 @@ function EditDeck() {
       imageUrl: reviewCard.image_url || '',
       flashcards: reviewCard.flashcards?.map(flashcard => ({
         id: flashcard.id,
-        front: flashcard.content, // In the current structure, we store both front and back in the same content field
-        back: flashcard.content,  // This will need to be adjusted based on your actual data structure
-        frontImageUrl: flashcard.image_url || '',
-        backImageUrl: '',
+        frontContent: flashcard.front_content,
+        backContent: flashcard.back_content,
+        frontImageUrl: flashcard.front_image_url || '',
+        backImageUrl: flashcard.back_image_url || '',
       })) || []
     })) || [];
 
@@ -104,8 +104,8 @@ function EditDeck() {
       flashcards: [
         { 
           id: `new-${Date.now()}-1`, 
-          front: null, 
-          back: null, 
+          frontContent: null, 
+          backContent: null, 
           frontImageUrl: '', 
           backImageUrl: '',
           isNew: true
@@ -153,8 +153,8 @@ function EditDeck() {
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `new-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      front: null,
-      back: null,
+      frontContent: null,
+      backContent: null,
       frontImageUrl: '',
       backImageUrl: '',
       isNew: true
@@ -208,9 +208,9 @@ function EditDeck() {
     );
     
     if (currentFlashcardSide === 'front') {
-      updatedCards[actualCardIndex].flashcards[actualFlashcardIndex].front = content;
+      updatedCards[actualCardIndex].flashcards[actualFlashcardIndex].frontContent = content;
     } else {
-      updatedCards[actualCardIndex].flashcards[actualFlashcardIndex].back = content;
+      updatedCards[actualCardIndex].flashcards[actualFlashcardIndex].backContent = content;
     }
     setReviewCards(updatedCards);
   };
@@ -227,7 +227,7 @@ function EditDeck() {
     
     if (!currentFlashcard) return null;
     
-    return currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back;
+    return currentFlashcardSide === 'front' ? currentFlashcard.frontContent : currentFlashcard.backContent;
   };
 
   // Helper function to check if content has actual text
@@ -255,8 +255,8 @@ function EditDeck() {
       const visibleFlashcards = card.flashcards.filter(fc => !fc.isDeleted);
       const hasValidFlashcards = visibleFlashcards.length >= 1 && 
                                visibleFlashcards.every(fc => {
-                                 const hasFront = hasContent(fc.front);
-                                 const hasBack = hasContent(fc.back);
+                                 const hasFront = hasContent(fc.frontContent);
+                                 const hasBack = hasContent(fc.backContent);
                                  return hasFront && hasBack;
                                });
       return hasReviewContent && hasValidFlashcards;
@@ -300,17 +300,11 @@ function EditDeck() {
           // Create flashcards for the new review card
           const visibleFlashcards = reviewCard.flashcards.filter(fc => !fc.isDeleted);
           for (const flashcard of visibleFlashcards) {
-            // Create front flashcard
             await FlashcardService.createFlashcard(
               createdReviewCard.id,
-              flashcard.front,
-              flashcard.frontImageUrl
-            );
-
-            // Create back flashcard
-            await FlashcardService.createFlashcard(
-              createdReviewCard.id,
-              flashcard.back,
+              flashcard.frontContent,
+              flashcard.frontImageUrl,
+              flashcard.backContent,
               flashcard.backImageUrl
             );
           }
@@ -330,19 +324,18 @@ function EditDeck() {
               // Create new flashcard
               await FlashcardService.createFlashcard(
                 reviewCard.id,
-                flashcard.front,
-                flashcard.frontImageUrl
-              );
-              await FlashcardService.createFlashcard(
-                reviewCard.id,
-                flashcard.back,
+                flashcard.frontContent,
+                flashcard.frontImageUrl,
+                flashcard.backContent,
                 flashcard.backImageUrl
               );
             } else if (!flashcard.isNew && !flashcard.isDeleted) {
               // Update existing flashcard
               await FlashcardService.updateFlashcard(flashcard.id, {
-                content: flashcard.front, // You may need to adjust this based on your data structure
-                image_url: flashcard.frontImageUrl
+                front_content: flashcard.frontContent,
+                front_image_url: flashcard.frontImageUrl,
+                back_content: flashcard.backContent,
+                back_image_url: flashcard.backImageUrl
               });
             }
           }
@@ -636,7 +629,7 @@ function EditDeck() {
                           >
                             <div className="text-xs font-medium text-gray-600 mb-2">Front</div>
                             <div className="text-sm text-gray-700 line-clamp-3">
-                              {hasContent(flashcard.front)
+                              {hasContent(flashcard.frontContent)
                                 ? 'Click to edit front side'
                                 : 'Click to edit front side'
                               }
@@ -656,7 +649,7 @@ function EditDeck() {
                           >
                             <div className="text-xs font-medium text-gray-600 mb-2">Back</div>
                             <div className="text-sm text-gray-700 line-clamp-3">
-                              {hasContent(flashcard.back)
+                              {hasContent(flashcard.backContent)
                                 ? 'Click to edit back side'
                                 : 'Click to edit back side'
                               }

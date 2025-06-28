@@ -7,8 +7,8 @@ import TiptapEditor from './TiptapEditor';
 
 interface FlashcardData {
   id: string;
-  front: any;
-  back: any;
+  frontContent: any;
+  backContent: any;
   frontImageUrl: string;
   backImageUrl: string;
 }
@@ -43,8 +43,8 @@ function CreateDeck() {
       flashcards: [
         { 
           id: 'temp-1-1', 
-          front: null, 
-          back: null, 
+          frontContent: null, 
+          backContent: null, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -66,8 +66,8 @@ function CreateDeck() {
       flashcards: [
         { 
           id: `temp-${Date.now()}-1`, 
-          front: null, 
-          back: null, 
+          frontContent: null, 
+          backContent: null, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -99,8 +99,8 @@ function CreateDeck() {
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `temp-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      front: null,
-      back: null,
+      frontContent: null,
+      backContent: null,
       frontImageUrl: '',
       backImageUrl: ''
     };
@@ -134,9 +134,9 @@ function CreateDeck() {
   const updateFlashcardContent = (content: any) => {
     const updatedCards = [...reviewCards];
     if (currentFlashcardSide === 'front') {
-      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].front = content;
+      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].frontContent = content;
     } else {
-      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].back = content;
+      updatedCards[currentCardIndex].flashcards[currentFlashcardIndex].backContent = content;
     }
     setReviewCards(updatedCards);
   };
@@ -148,7 +148,7 @@ function CreateDeck() {
     
     if (!currentFlashcard) return null;
     
-    return currentFlashcardSide === 'front' ? currentFlashcard.front : currentFlashcard.back;
+    return currentFlashcardSide === 'front' ? currentFlashcard.frontContent : currentFlashcard.backContent;
   };
 
   // Helper function to check if content has actual text
@@ -196,8 +196,8 @@ function CreateDeck() {
           const hasReviewContent = hasContent(card.content);
           const hasValidFlashcards = card.flashcards.length >= 1 && 
                                    card.flashcards.every(fc => {
-                                     const hasFront = hasContent(fc.front);
-                                     const hasBack = hasContent(fc.back);
+                                     const hasFront = hasContent(fc.frontContent);
+                                     const hasBack = hasContent(fc.backContent);
                                      return hasFront && hasBack;
                                    });
           return hasReviewContent && hasValidFlashcards;
@@ -233,26 +233,17 @@ function CreateDeck() {
 
         // Create flashcards for this review card
         for (const flashcard of reviewCard.flashcards) {
-          // Create front flashcard
-          const { error: frontError } = await FlashcardService.createFlashcard(
+          // Create single flashcard with both front and back content
+          const { error: flashcardError } = await FlashcardService.createFlashcard(
             createdReviewCard.id,
-            flashcard.front,
-            flashcard.frontImageUrl
-          );
-
-          if (frontError) {
-            throw new Error(frontError.message || 'Failed to create front flashcard');
-          }
-
-          // Create back flashcard
-          const { error: backError } = await FlashcardService.createFlashcard(
-            createdReviewCard.id,
-            flashcard.back,
+            flashcard.frontContent,
+            flashcard.frontImageUrl,
+            flashcard.backContent,
             flashcard.backImageUrl
           );
 
-          if (backError) {
-            throw new Error(backError.message || 'Failed to create back flashcard');
+          if (flashcardError) {
+            throw new Error(flashcardError.message || 'Failed to create flashcard');
           }
         }
       }
@@ -549,8 +540,8 @@ function CreateDeck() {
                         >
                           <div className="text-xs font-medium text-gray-600 mb-2">Front</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
-                            {hasContent(flashcard.front)
-                              ? getTextPreview(flashcard.front, 100)
+                            {hasContent(flashcard.frontContent)
+                              ? getTextPreview(flashcard.frontContent, 100)
                               : 'Click to edit front side'
                             }
                           </div>
@@ -569,8 +560,8 @@ function CreateDeck() {
                         >
                           <div className="text-xs font-medium text-gray-600 mb-2">Back</div>
                           <div className="text-sm text-gray-700 line-clamp-3">
-                            {hasContent(flashcard.back)
-                              ? getTextPreview(flashcard.back, 100)
+                            {hasContent(flashcard.backContent)
+                              ? getTextPreview(flashcard.backContent, 100)
                               : 'Click to edit back side'
                             }
                           </div>
@@ -696,7 +687,7 @@ function CreateDeck() {
                           <div>
                             <div className="text-xs font-medium text-gray-500 mb-1">Front</div>
                             <TiptapEditor
-                              value={flashcard.front}
+                              value={flashcard.frontContent}
                               onChange={() => {}}
                               readOnly={true}
                             />
@@ -704,7 +695,7 @@ function CreateDeck() {
                           <div>
                             <div className="text-xs font-medium text-gray-500 mb-1">Back</div>
                             <TiptapEditor
-                              value={flashcard.back}
+                              value={flashcard.backContent}
                               onChange={() => {}}
                               readOnly={true}
                             />

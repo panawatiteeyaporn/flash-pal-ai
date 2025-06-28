@@ -111,15 +111,23 @@ export class FlashcardService {
     return { error };
   }
 
-  // Flashcard operations
-  static async createFlashcard(reviewCardId: string, content: any, imageUrl: string = ''): Promise<{ data: Flashcard | null; error: any }> {
+  // Flashcard operations - Updated to handle front and back content
+  static async createFlashcard(
+    reviewCardId: string, 
+    frontContent: any, 
+    frontImageUrl: string = '',
+    backContent: any,
+    backImageUrl: string = ''
+  ): Promise<{ data: Flashcard | null; error: any }> {
     const { data, error } = await supabase
       .from('flashcards')
       .insert([
         {
           review_card_id: reviewCardId,
-          content,
-          image_url: imageUrl
+          front_content: frontContent,
+          front_image_url: frontImageUrl,
+          back_content: backContent,
+          back_image_url: backImageUrl
         }
       ])
       .select()
@@ -170,7 +178,17 @@ export class FlashcardService {
         *,
         review_cards (
           *,
-          flashcards (*)
+          flashcards (
+            id,
+            review_card_id,
+            front_content,
+            front_image_url,
+            back_content,
+            back_image_url,
+            feedback,
+            created_at,
+            updated_at
+          )
         )
       `)
       .eq('id', deckId)

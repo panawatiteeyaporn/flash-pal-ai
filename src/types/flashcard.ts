@@ -10,7 +10,7 @@ export interface Deck {
 export interface ReviewCard {
   id: string;
   deck_id: string;
-  content: any; // Quill Delta format
+  content: any; // Tiptap JSON format
   image_url: string;
   created_at: string;
   updated_at: string;
@@ -19,8 +19,10 @@ export interface ReviewCard {
 export interface Flashcard {
   id: string;
   review_card_id: string;
-  content: any; // Quill Delta format
-  image_url: string;
+  front_content: any; // Tiptap JSON format
+  front_image_url: string;
+  back_content: any; // Tiptap JSON format
+  back_image_url: string;
   feedback: 'Easy' | 'Medium' | 'Hard' | '';
   created_at: string;
   updated_at: string;

@@ -233,11 +233,25 @@ function DeckView() {
                             </div>
                           </div>
                           
-                          <TiptapEditor
-                            value={flashcard.content}
-                            onChange={() => {}}
-                            readOnly={true}
-                          />
+                          <div className="space-y-4">
+                            <div>
+                              <div className="text-xs font-medium text-gray-500 mb-2">Front</div>
+                              <TiptapEditor
+                                value={flashcard.front_content}
+                                onChange={() => {}}
+                                readOnly={true}
+                              />
+                            </div>
+                            
+                            <div>
+                              <div className="text-xs font-medium text-gray-500 mb-2">Back</div>
+                              <TiptapEditor
+                                value={flashcard.back_content}
+                                onChange={() => {}}
+                                readOnly={true}
+                              />
+                            </div>
+                          </div>
                           
                           {flashcard.feedback && (
                             <div className="mt-2 text-xs text-gray-500">
