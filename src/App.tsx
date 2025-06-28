@@ -11,6 +11,7 @@ import CreateDeck from './components/CreateDeck';
 import EditDeck from './components/EditDeck';
 import DeckList from './components/DeckList';
 import DeckView from './components/DeckView';
+import StudySession from './components/StudySession';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -34,6 +35,7 @@ function AppRoutes() {
 	    <Route path="/edit-deck/:id" element={ <ProtectedRoute> <EditDeck /> </ProtectedRoute> } />
 	    <Route path="/decks" element={ <ProtectedRoute> <DeckList /> </ProtectedRoute> } />
 	    <Route path="/deck/:id" element={ <ProtectedRoute> <DeckView /> </ProtectedRoute> } />
+	    <Route path="/study/:id" element={ <ProtectedRoute> <StudySession /> </ProtectedRoute> } />
     </Routes>
   );
 }

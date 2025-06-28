@@ -5,6 +5,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { FlashcardService } from '../lib/flashcardService';
 import TiptapEditor from './TiptapEditor';
 
+// Empty Tiptap content structure
+const EMPTY_TIPTAP_CONTENT = {
+  type: 'doc',
+  content: [{ type: 'paragraph' }]
+};
+
 interface FlashcardData {
   id: string;
   frontContent: any;
@@ -38,13 +44,13 @@ function CreateDeck() {
     {
       id: 'temp-1',
       name: 'Review Card 1',
-      content: null,
+      content: EMPTY_TIPTAP_CONTENT,
       imageUrl: '',
       flashcards: [
         { 
           id: 'temp-1-1', 
-          frontContent: null, 
-          backContent: null, 
+          frontContent: EMPTY_TIPTAP_CONTENT, 
+          backContent: EMPTY_TIPTAP_CONTENT, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -61,13 +67,13 @@ function CreateDeck() {
     const newCard: ReviewCardData = {
       id: `temp-${Date.now()}`,
       name: `Review Card ${newCardNumber}`,
-      content: null,
+      content: EMPTY_TIPTAP_CONTENT,
       imageUrl: '',
       flashcards: [
         { 
           id: `temp-${Date.now()}-1`, 
-          frontContent: null, 
-          backContent: null, 
+          frontContent: EMPTY_TIPTAP_CONTENT, 
+          backContent: EMPTY_TIPTAP_CONTENT, 
           frontImageUrl: '', 
           backImageUrl: '' 
         }
@@ -99,8 +105,8 @@ function CreateDeck() {
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `temp-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      frontContent: null,
-      backContent: null,
+      frontContent: EMPTY_TIPTAP_CONTENT,
+      backContent: EMPTY_TIPTAP_CONTENT,
       frontImageUrl: '',
       backImageUrl: ''
     };

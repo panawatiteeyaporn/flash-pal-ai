@@ -6,6 +6,12 @@ import { FlashcardService } from '../lib/flashcardService';
 import { DeckWithCards } from '../types/flashcard';
 import TiptapEditor from './TiptapEditor';
 
+// Empty Tiptap content structure
+const EMPTY_TIPTAP_CONTENT = {
+  type: 'doc',
+  content: [{ type: 'paragraph' }]
+};
+
 interface FlashcardData {
   id: string;
   frontContent: any;
@@ -99,13 +105,13 @@ function EditDeck() {
     const newCard: ReviewCardData = {
       id: `new-${Date.now()}`,
       name: `Review Card ${newCardNumber}`,
-      content: null,
+      content: EMPTY_TIPTAP_CONTENT,
       imageUrl: '',
       flashcards: [
         { 
           id: `new-${Date.now()}-1`, 
-          frontContent: null, 
-          backContent: null, 
+          frontContent: EMPTY_TIPTAP_CONTENT, 
+          backContent: EMPTY_TIPTAP_CONTENT, 
           frontImageUrl: '', 
           backImageUrl: '',
           isNew: true
@@ -153,8 +159,8 @@ function EditDeck() {
   const addFlashcard = (cardIndex: number) => {
     const newFlashcard: FlashcardData = {
       id: `new-${Date.now()}-${reviewCards[cardIndex].flashcards.length + 1}`,
-      frontContent: null,
-      backContent: null,
+      frontContent: EMPTY_TIPTAP_CONTENT,
+      backContent: EMPTY_TIPTAP_CONTENT,
       frontImageUrl: '',
       backImageUrl: '',
       isNew: true
