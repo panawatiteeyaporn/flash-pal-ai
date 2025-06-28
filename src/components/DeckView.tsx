@@ -51,12 +51,23 @@ function DeckView() {
     }
   };
 
+  const handleStartStudy = () => {
+    if (id) {
+      navigate(`/study/${id}`);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const canStartStudy = () => {
+    return deck?.review_cards && deck.review_cards.length > 0 && 
+           deck.review_cards.some(card => card.flashcards && card.flashcards.length > 0);
   };
 
   if (loading) {
@@ -157,7 +168,11 @@ function DeckView() {
             
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+              <button 
+                onClick={handleStartStudy}
+                disabled={!canStartStudy()}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
                 <Play className="w-5 h-5" />
                 <span>Start Study Session</span>
               </button>
@@ -185,6 +200,14 @@ function DeckView() {
                 </button>
               </div>
             </div>
+
+            {!canStartStudy() && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p className="text-amber-700 text-sm">
+                  <strong>Note:</strong> Add review cards and flashcards to start studying this deck.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
