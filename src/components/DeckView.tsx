@@ -59,19 +59,6 @@ function DeckView() {
     });
   };
 
-  const canStartStudySession = () => {
-    if (!deck?.review_cards || deck.review_cards.length === 0) return false;
-    
-    // Check if there's at least one review card with content or one flashcard
-    return deck.review_cards.some(reviewCard => {
-      const hasContent = reviewCard.content && 
-        reviewCard.content.content && 
-        reviewCard.content.content.length > 0;
-      const hasFlashcards = reviewCard.flashcards && reviewCard.flashcards.length > 0;
-      return hasContent || hasFlashcards;
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
@@ -170,20 +157,10 @@ function DeckView() {
             
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
-              {canStartStudySession() ? (
-                <Link
-                  to={`/study/${id}`}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
-                >
-                  <Play className="w-5 h-5" />
-                  <span>Start Study Session</span>
-                </Link>
-              ) : (
-                <div className="bg-gray-100 text-gray-500 px-6 py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 cursor-not-allowed">
-                  <Play className="w-5 h-5" />
-                  <span>Add content to start studying</span>
-                </div>
-              )}
+              <button className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                <Play className="w-5 h-5" />
+                <span>Start Study Session</span>
+              </button>
               
               <div className="flex flex-col sm:flex-row gap-3">
                 <button className="bg-white/70 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-white/90 transition-all duration-200 border border-white/30 flex items-center justify-center space-x-2">
