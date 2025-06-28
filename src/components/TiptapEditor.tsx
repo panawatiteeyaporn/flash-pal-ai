@@ -166,7 +166,7 @@ function TiptapEditor({
 
   if (readOnly) {
     return (
-      <div className={`tiptap-readonly ${className}`}>
+      <div className={`tiptap-readonly ${className} not-prose`}>
         <EditorContent editor={editor} />
       </div>
     );
