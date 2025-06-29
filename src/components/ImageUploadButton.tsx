@@ -21,7 +21,7 @@ function ImageUploadButton({ editor, className = '' }: ImageUploadButtonProps) {
     }
 
     // Check file size (limit to 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 3 * 1024 * 1024) {
       alert('Image size should be less than 5MB');
       return;
     }
