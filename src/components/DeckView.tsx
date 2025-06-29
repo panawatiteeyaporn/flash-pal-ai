@@ -254,7 +254,7 @@ function DeckView() {
         {deck.review_cards && deck.review_cards.length > 0 ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Review Cards</h2>
+              <h2 className="text-2xl font-bold text-gray-900">All Cards</h2>
             </div>
             
             {deck.review_cards.map((reviewCard, index) => (
