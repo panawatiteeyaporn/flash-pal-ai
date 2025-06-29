@@ -33,11 +33,11 @@ function CreateDeck() {
   const [deckName, setDeckName] = useState('');
   const [deckDescription, setDeckDescription] = useState('');
   
-  // Review cards data
+  // Study cards data
   const [reviewCards, setReviewCards] = useState<ReviewCardData[]>([
     {
       id: 'temp-1',
-      name: 'Review Card 1',
+      name: 'Study Card 1',
       content: null,
       imageUrl: '',
       flashcards: [
@@ -60,7 +60,7 @@ function CreateDeck() {
     const newCardNumber = reviewCards.length + 1;
     const newCard: ReviewCardData = {
       id: `temp-${Date.now()}`,
-      name: `Review Card ${newCardNumber}`,
+      name: `Study Card ${newCardNumber}`,
       content: null,
       imageUrl: '',
       flashcards: [
@@ -219,7 +219,7 @@ function CreateDeck() {
         throw new Error(deckError?.message || 'Failed to create deck');
       }
 
-      // Create review cards and flashcards
+      // Create study cards and flashcards
       for (const reviewCard of reviewCards) {
         const { data: createdReviewCard, error: reviewCardError } = await FlashcardService.createReviewCard(
           deck.id,
@@ -228,10 +228,10 @@ function CreateDeck() {
         );
 
         if (reviewCardError || !createdReviewCard) {
-          throw new Error(reviewCardError?.message || 'Failed to create review card');
+          throw new Error(reviewCardError?.message || 'Failed to create study card');
         }
 
-        // Create flashcards for this review card
+        // Create flashcards for this study card
         for (const flashcard of reviewCard.flashcards) {
           // Create single flashcard with both front and back content
           const { error: flashcardError } = await FlashcardService.createFlashcard(
@@ -399,7 +399,7 @@ function CreateDeck() {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30 sticky top-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Review Cards</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Study Cards</h3>
                 
                 <div className="space-y-2 mb-4">
                   {reviewCards.map((card, index) => (
@@ -451,14 +451,14 @@ function CreateDeck() {
                   className="w-full bg-white/70 border-2 border-dashed border-gray-300 text-gray-600 py-3 rounded-lg hover:bg-white/90 hover:border-indigo-300 hover:text-indigo-600 transition-all duration-200 flex items-center justify-center space-x-2"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Add Review Card</span>
+                  <span>Add Study Card</span>
                 </button>
               </div>
             </div>
 
             {/* Main Content */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Review Card Editor */}
+              {/* Study Card Editor */}
               <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/30">
                 <div className="flex items-center space-x-2 mb-4">
                   <BookOpen className="w-5 h-5 text-indigo-500" />
@@ -654,7 +654,7 @@ function CreateDeck() {
               <div className="flex items-center space-x-6 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <BookOpen className="w-4 h-4" />
-                  <span>{reviewCards.length} Review Cards</span>
+                  <span>{reviewCards.length} Study Cards</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Zap className="w-4 h-4" />
